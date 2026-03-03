@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<title>Disease Predictor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    
+
+    
+/* Equal height */
+/* Equal Height Dashboard Cards */
+.stat-card {
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Animated Icon */
+.icon {
+    font-size: 35px;
+    margin-bottom: 10px;
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Premium Hover Glow */
+.premium-card {
+    position: relative;
+    transition: all 0.4s ease;
+}
+
+.premium-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+/* Gradient Border Glow */
+.premium-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 20px;
+    background: linear-gradient(45deg, #6dd5ed, #764ba2, #667eea);
+    z-index: -1;
+    filter: blur(12px);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.premium-card:hover::before {
+    opacity: 1;
+}
+/* Animated Gradient Background */
+body {
+    min-height: 100vh;
+
+    background: linear-gradient(-45deg, #667eea, #764ba2, #6dd5ed, #2193b0);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+    color: white;
+}
+
+@keyframes gradientMove {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+
+
+/* Glassmorphism Card */
+.glass-card {
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+/* Dark Mode */
+.dark-mode {
+    background: #111 !important;
+    color: white !important;
+}
+
+/* Loading Overlay */
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: white;
+}
+
+.spinner-container {
+    text-align: center;
+}
+
+/* Select2 dropdown text color fix */
+.select2-container--default .select2-selection--multiple {
+    background-color: white !important;
+    color: black !important;
+}
+
+.select2-container--default .select2-selection__choice {
+    background-color: #e9ecef !important;
+    color: black !important;
+    border: none !important;
+}
+
+.select2-container--default .select2-results__option {
+    color: black !important;
+}
+
+.select2-dropdown {
+    background-color: white !important;
+    color: black !important;
+}
+.stat-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+.badge {
+    animation: pulseRisk 2s infinite;
+}
+
+@keyframes pulseRisk {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+/* Particle Background */
+#tsparticles {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+/* Center Forms */
+.center-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Optional width control */
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* ===== Brand Title Styling ===== */
+.brand-title {
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 50px;
+    background: linear-gradient(45deg, #6dd5ed, #764ba2);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: white;
+}
+
+</style>
+</head>
+
+<body>
+  
+<div id="tsparticles"></div>
+<nav class="navbar navbar-expand-lg navbar-dark px-4">
+
+    <!-- Left Empty Space -->
+    <div style="width: 200px;"></div>
+
+    <!-- Center Title -->
+    <div class="mx-auto text-center">
+        <h3 class="brand-title mb-0">
+            🩺 Disease Predictor
+        </h3>
+    </div>
+
+    <!-- Right Side Controls -->
+    <div class="d-flex align-items-center gap-3" style="width: 200px; justify-content: flex-end;">
+        
+        <!-- Username Dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                {{ username }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <button class="btn btn-outline-light" onclick="toggleDark()">
+            🌙
+        </button>
+
+    </div>
+
+</nav>
+<div class="container py-5">
+    {% block content %}{% endblock %}
+</div>
+<script>
+function toggleDark(){
+    document.body.classList.toggle("dark-mode");
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function handleSubmit(event) {
+    event.preventDefault();
+
+    const overlay = document.getElementById("loadingOverlay");
+    overlay.style.display = "flex";
+
+    setTimeout(() => {
+        event.target.submit();
+    }, 2000);
+
+    return false;
+}
+
+</script>
+<script>
+$(document).ready(function() {
+    $('#symptoms').select2({
+        placeholder: "Type or select symptoms",
+        tags: true,              // 👈 Allow custom typing
+        tokenSeparators: [','],  // 👈 Allow comma separation
+        width: '100%'
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const counters = document.querySelectorAll('.counter');
+
+    counters.forEach(counter => {
+        const updateCounter = () => {
+            const target = +counter.getAttribute('data-target');
+            const current = +counter.innerText;
+
+            const increment = target / 40;
+
+            if (current < target) {
+                counter.innerText = Math.ceil(current + increment);
+                setTimeout(updateCounter, 25);
+            } else {
+                counter.innerText = target;
+            }
+        };
+
+        updateCounter();
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const riskValueMap = {
+        "Low": 30,
+        "Medium": 60,
+        "High": 90
+    };
+
+    const riskValue = riskValueMap["{{ risk_level }}"] || 30;
+
+    const ctx = document.getElementById('riskGauge');
+
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [riskValue, 100 - riskValue],
+                    backgroundColor: [
+                        riskValue < 50 ? '#28a745' :
+                        riskValue < 80 ? '#ffc107' : '#dc3545',
+                        '#e9ecef'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                animation: {
+    animateRotate: true,
+    duration: 1500
+},
+                rotation: -90,
+                circumference: 180,
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            }
+        });
+    }
+
+});
+</script>
+<script>
+tsParticles.load("tsparticles", {
+    background: {
+        color: "transparent"
+    },
+    fpsLimit: 60,
+    particles: {
+        number: {
+            value: 60
+        },
+        color: {
+            value: "#ffffff"
+        },
+        shape: {
+            type: "circle"
+        },
+        opacity: {
+            value: 0.3
+        },
+        size: {
+            value: 3
+        },
+        move: {
+            enable: true,
+            speed: 1,
+            direction: "none",
+            outModes: {
+                default: "bounce"
+            }
+        },
+        links: {
+            enable: true,
+            distance: 120,
+            color: "#ffffff",
+            opacity: 0.2,
+            width: 1
+        }
+    },
+    detectRetina: true
+});
+</script>
+</div>
+</body>
+</html>

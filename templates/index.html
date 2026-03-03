@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="glass-card">
+
+    <h3 class="mb-4">Welcome, {{ username }} 👋</h3>
+
+    <!-- Loading Spinner Overlay -->
+    <div id="loadingOverlay" style="display:none;">
+        <div class="spinner-container">
+            <div class="spinner-border text-light" role="status"></div>
+            <p class="mt-3">Analyzing symptoms...</p>
+        </div>
+    </div>
+
+    <!-- ===== DASHBOARD STATS CARDS ===== -->
+    <div class="row mb-4 g-4 align-items-stretch">
+
+        <div class="col-lg-3 col-md-6 col-12 d-flex">
+            <div class="glass-card stat-card w-100 text-center premium-card">
+                <div class="icon">📊</div>
+                <h6>Total Predictions</h6>
+                <h2 class="counter" data-target="{{ total_predictions }}">0</h2>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-12 d-flex">
+            <div class="glass-card stat-card w-100 text-center premium-card">
+                <div class="icon">🦠</div>
+                <h6>Last Disease</h6>
+                <h4>{{ last_disease }}</h4>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-12 d-flex">
+            <div class="glass-card stat-card w-100 text-center premium-card">
+                <div class="icon">🎯</div>
+                <h6>Model Accuracy</h6>
+                <h2 class="counter" data-target="{{ accuracy_value }}">0</h2>%
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-12 d-flex">
+            <div class="glass-card stat-card w-100 text-center premium-card">
+                <div class="icon">⚠</div>
+                <h6>Risk Level</h6>
+                <canvas id="riskGauge" width="150" height="100"></canvas>
+                <p class="fw-bold mt-2">{{ risk_level }}</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== SYMPTOM FORM ===== -->
+    <form method="POST" onsubmit="return handleSubmit(event)">
+
+        <div class="mb-4">
+            <label class="form-label fw-bold">Enter or Search Symptoms</label>
+
+            <select id="symptoms"
+                    name="symptoms"
+                    class="form-select"
+                    multiple="multiple"
+                    style="width:100%;">
+
+                {% for symptom in symptom_list %}
+                    <option value="{{ symptom }}">{{ symptom }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-light fw-bold">
+                🔍 Predict Disease
+            </button>
+        </div>
+
+    </form>
+
+    <!-- ===== TOP 3 PREDICTIONS ===== -->
+    {% if results %}
+<hr>
+<h4 class="mb-3">Top 3 Predictions</h4>
+
+<canvas id="probChart" height="120"></canvas>
+
+<!-- Hidden JSON Data -->
+<script id="chart-data" type="application/json">
+    {{ results | tojson }}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const rawData = document.getElementById("chart-data").textContent;
+    const chartResults = JSON.parse(rawData);
+
+    const chartLabels = chartResults.map(item => item[0]);
+    const chartValues = chartResults.map(item => item[1]);
+
+    const ctx = document.getElementById('probChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Probability (%)',
+                data: chartValues,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: {
+                duration: 1500
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+});
+</script>
+{% endif %}
+
+    <!-- ===== DESCRIPTION ===== -->
+    {% if description %}
+        <div class="mt-4">
+            <h5>Description</h5>
+            <p>{{ description }}</p>
+
+            <h5>Precautions</h5>
+            <p>{{ precautions }}</p>
+        </div>
+    {% endif %}
+
+    <!-- ===== PREDICTION HISTORY ===== -->
+    {% if user_predictions %}
+        <hr>
+        <h4 class="mt-4">Prediction History</h4>
+
+        <ul class="list-group mt-3">
+            {% for p in user_predictions %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ p.disease }}</span>
+                <span>{{ p.probability }}%</span>
+                <small>{{ p.timestamp.strftime('%d %b %Y %H:%M') }}</small>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+</div>
+
+{% endblock %}
